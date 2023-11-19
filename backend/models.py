@@ -16,7 +16,8 @@ class Orders(Base):
     Ali_order_id = Column(String)
     Order_earning = Column(Integer)
     Buyer_name = Column(String)
-    Contact_number = Column(String)    
+    Contact_number = Column(String)
+    Tracking_number = Column(String)   
 
 
 class Disputes(Base):

@@ -1,1 +1,5 @@
 https://fastapi.tiangolo.com/tutorial/sql-databases/
+
+.\venv\Scripts\Activate
+
+https://parcelsapp.com/en/tracking/RR9710680207F

@@ -1,11 +1,29 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 
 const Items = () => {
   const [itemId, setItemId] = useState("");
   const [itemLink, setItemLink] = useState("");
-  const [newLink, setNewLink] = useState("");
   const [message, setMessage] = useState("");
+  const [ID, setID] = useState("");
+  const [Link, setLink] = useState("");
+  const [newLink, setnewLink] = useState("");
+  const [totalCount, settotalCount] = useState("");
+
+
+  useEffect(() => {
+    const fetchTotalItemCount = async () => {
+      try{
+        const response = await axios.get(`http://127.0.0.1:8000/items/`);
+        settotalCount(response.data.total_count)
+      }
+      catch (error){
+        console.error('Error fetching total item count:', error);
+      }
+    };
+
+    fetchTotalItemCount();
+  }, []);
 
   const handleAddItem = async (e) => {
     e.preventDefault();
@@ -29,8 +47,13 @@ const Items = () => {
   const handleUpdateItem = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://127.0.0.1:8000/update_item_link/?Item_id=${itemId}&new_link=${newLink}`);
+      const old_response = await axios.get(`http://127.0.0.1:8000/get_item_link/?Item_id=${itemId}`);
+      await axios.put(`http://127.0.0.1:8000/update_item_link/?Item_id=${itemId}&new_link=${itemLink}`);
+      const new_response = await axios.get(`http://127.0.0.1:8000/get_item_link/?Item_id=${itemId}`);
       setMessage("Item link updated successfully.");
+      setLink("Link before update: " + old_response.data.Link);
+      setnewLink("Link after update: " + new_response.data.Link);
+
     } catch (error) {
       setMessage("Error: " + error.message);
     }
@@ -72,7 +95,11 @@ const Items = () => {
         </button>
       </form>
       <div>
-        <p>{message}</p>
+        <div><p>Total Item count: {totalCount}</p></div>
+        <div><p>{message}</p></div>
+        <div><p>{ID}</p></div>
+        <div><p>{Link}</p></div>
+        <div><p>{newLink}</p></div>
       </div>
     </div>
   )
