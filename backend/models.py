@@ -18,7 +18,9 @@ class Orders(Base):
     Buyer_name = Column(String)
     Contact_number = Column(String)
     Tracking_number = Column(String)
-       
+    next_tracking_number = Column(String, nullable=True)
+    return_case = Boolean(bool, default=True)
+    loss = Column(Integer, nullable=True)
 
 
 class Disputes(Base):
