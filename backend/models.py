@@ -17,7 +17,8 @@ class Orders(Base):
     Order_earning = Column(Integer)
     Buyer_name = Column(String)
     Contact_number = Column(String)
-    Tracking_number = Column(String)   
+    Tracking_number = Column(String)
+       
 
 
 class Disputes(Base):
