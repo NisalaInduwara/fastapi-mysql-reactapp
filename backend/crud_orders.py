@@ -5,6 +5,12 @@ from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
 import models
 from typing import Optional
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+
+chrome_driver_path = 'webdriver\chromedriver.exe'
+chrome_service = Service(executable_path=chrome_driver_path)
+tracking_details_path = 'https://parcelsapp.com/en/tracking/'
 
 
 def add_order(db: Session, Order_id: str, 
@@ -31,7 +37,7 @@ def add_order(db: Session, Order_id: str,
         db.add(db_item)
         db.commit()
         db.refresh(db_item)
-        return db_item
+        return {'Order_id': db_item.Order_id}
     
     except IntegrityError as e:
         db.rollback()
@@ -82,9 +88,10 @@ def track_order(db: Session, Order_id: str):
             tracking_number = order.Tracking_number
             next_tracking_number = order.next_tracking_number
             if next_tracking_number:
-                return {'tracking_number': next_tracking_number}
+                return {'tracking_link': f'{tracking_details_path}{next_tracking_number}'}
             else:
-                return {'tracking_number': tracking_number}
+                return {'tracking_link': f'{tracking_details_path}{tracking_number}'}
+
         else:
             raise HTTPException(status_code=404, detail="Order not found")
         
@@ -170,11 +177,20 @@ def resolve_return_case(db: Session, Order_id: str, return_case: bool, recovery_
 
     try:
         order = db.query(models.Orders).filter(models.Orders.Order_id == Order_id).first()
-        loss = order.loss
+        if order:
+            final_loss = order.loss - recovery_amount
+            order.loss = final_loss
+            order.return_case = return_case
+            db.commit()
+            db.refresh(order)
+            return {'ID': order.Order_id, 'loss': order.loss}
+        else:
+            raise HTTPException(status_code=404, detail="No order data found")
         
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error closing return cases: {str(e)}")
 
-
-    
 
 def get_counts(db: Session):
     
