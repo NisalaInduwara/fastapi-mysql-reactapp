@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import orders from './components/orders';
 import Items from './components/items';
 import disputes from './components/disputes';
@@ -6,8 +6,16 @@ import disputes from './components/disputes';
 function App(){
     const [activeTab, setActiveTab] = useState('home');
 
+    useEffect(() => {
+        const previousTab = localStorage.getItem('activateTab');
+        if (previousTab){
+            setActiveTab(previousTab);
+        }
+    }, []);
+
     const handleTabChange = (tabName) => {
         setActiveTab(tabName);
+        localStorage.setItem('activateTab', tabName);
     };
 
     return(
@@ -17,13 +25,13 @@ function App(){
                     Home page
                 </button>
                 <button onClick={() => handleTabChange('orders')} className={activeTab === 'orders' ? 'active' : ''}>
-                    Order Data Page
+                    Orders
                 </button>
                 <button onClick={() => handleTabChange('items')} className={activeTab === 'items' ? 'active' : ''}>
-                    Item Data Page
+                    Items
                 </button>
                 <button onClick={() => handleTabChange('disputes')} className={activeTab === 'disputes' ? 'active' : ''}>
-                    Disputes Data Page
+                    Returns
                 </button>
             </div>
             <div className="tab-content">

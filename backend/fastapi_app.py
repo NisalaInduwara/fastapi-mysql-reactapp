@@ -60,9 +60,8 @@ async def get_item(Item_id: str, db: Session = Depends(get_db)):
     return {"Link": link}
 
 @app.get("/items/")
-async def get_items_count(db: Session = Depends(get_db)):
-    total_count = crud_items.get_items_count(db)
-    return {"total_count": total_count['total_count']}
+async def get_items(db: Session = Depends(get_db)):
+    return crud_items.get_items(db)
 
 @app.put("/update_item_link/")
 async def update_item(Item_id: str, new_link: str, db: Session = Depends(get_db)):
@@ -90,7 +89,7 @@ async def add_order(order: schemas.PreOrderCreate, db: Session = Depends(get_db)
 async def add_order(order: schemas.PostOrderCreate, db: Session = Depends(get_db)):
     try:
         added_order = crud_orders.add_post_order(db, order.Order_id, order.Ali_order_id, order.Tracking_number,
-                                            order.next_tracking_number)
+                                            order.next_tracking_number, order.item_cost)
         return added_order
     
     except Exception as e:
@@ -106,35 +105,46 @@ async def make_return(order: schemas.ReturnCreate, db: Session = Depends(get_db)
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
     
 
-@app.get('/get_order_data/')
-async def get_order_data(Order_id: Optional[str]=None, Tracking_number: Optional[str]=None, Ali_order_id: Optional[str]=None,
-                  db: Session = Depends(get_db)):
-    order_data = crud_orders.get_order_data(db, Order_id, Tracking_number, Ali_order_id)
+@app.get('/get_preorder_data/')
+async def get_preorder_data(Order_id: str, db: Session = Depends(get_db)):
+    order_data = crud_orders.get_preorder_data(db, Order_id)
     return order_data
+
+
+@app.get('/get_postorder_data/')
+async def get_postorder_data(Order_id: str, Ali_order_id: str, 
+                            Tracking_number: str, db: Session = Depends(get_db)):
+    order_data = crud_orders.get_preorder_data(db, Order_id, Ali_order_id, Tracking_number)
+    return order_data
+
     
-@app.get("/track_order/")
+@app.get("/get_tracking_link/")
 async def track_order(Order_id: str, db: Session = Depends(get_db)):
-    return crud_orders.track_order(db, Order_id)
+    return crud_orders.get_tracking_link(db, Order_id)
+
 
 @app.delete("/delete_order/")
 async def delete_order(Order_id: str, db: Session = Depends(get_db)):
     return crud_orders.delete_order(db, Order_id)
 
+
 @app.get("/get_contact_details/")
 async def get_contact_details(Order_Date: str, db: Session = Depends(get_db)):
     return crud_orders.get_contact_details(db, Order_Date)
+
 
 @app.put("/add_next_tracking_number/")
 async def add_next_tracking_number(next_tracking_number: str, Tracking_number: Optional[str]=None, db: Session = Depends(get_db)):
     return crud_orders.add_next_tracking_number(db, next_tracking_number, Tracking_number)
 
+
 @app.put("/resolve_return/")
 async def resolve_return(Order_id: str, ali_refund: int, db: Session = Depends(get_db)):
     return crud_orders.resolve_return_case(db, Order_id, ali_refund)
 
-# @app.get("/get_counts/")
-# async def get_counts(db: Session = Depends(get_db)):
-#     return crud_orders.get_counts(db)
+@app.get("/get_counts/")
+async def get_counts(db: Session = Depends(get_db)):
+    return crud_orders.get_counts(db)
 
 
     

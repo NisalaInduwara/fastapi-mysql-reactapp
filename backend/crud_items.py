@@ -4,6 +4,7 @@ from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
 import models
+from typing import List
 
 
 def create_item(db: Session, Item_id: str, Item_link: str):
@@ -67,11 +68,14 @@ def delete_item(db: Session, Item_id: str):
         raise HTTPException(status_code=500, detail=f"Error deleting items: {str(e)}")
 
 
-def get_items_count(db: Session):
+def get_items(db: Session) -> List[models.Item]:
+    items = []
     try:
-        total_count = db.query(func.count(models.Item.Item_id)).scalar()
-        return {"total_count": total_count}
+        all_items = db.query(models.Item).all()
+        for item in all_items:
+            formatted_item = f'{item.Item_id} - {item.Item_link}'
+            items.append(formatted_item)
+        return items
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error retrieving items: {str(e)}")
-

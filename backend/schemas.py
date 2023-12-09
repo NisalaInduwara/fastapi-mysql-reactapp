@@ -18,6 +18,7 @@ class PostOrderCreate(BaseModel):
     Ali_order_id: str
     Tracking_number: str
     next_tracking_number: str
+    item_cost: int
 
 class ReturnCreate(BaseModel):
     Order_id: str
