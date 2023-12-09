@@ -5,25 +5,26 @@ const Items = () => {
   const [itemId, setItemId] = useState("");
   const [itemLink, setItemLink] = useState("");
   const [message, setMessage] = useState("");
-  const [ID, setID] = useState("");
+  const [ID, setID] = useState("")
   const [Link, setLink] = useState("");
   const [newLink, setnewLink] = useState("");
-  const [totalCount, settotalCount] = useState("");
+  const [items, setItems] = useState("");
 
 
   useEffect(() => {
-    const fetchTotalItemCount = async () => {
-      try{
-        const response = await axios.get(`http://127.0.0.1:8000/items/`);
-        settotalCount(response.data.total_count)
-      }
-      catch (error){
-        console.error('Error fetching total item count:', error);
+    const fetchItems = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/items/');
+        console.log(response.data);
+        setItems(response.data);
+      } catch (error) {
+        console.error('Error fetching items:', error);
       }
     };
 
-    fetchTotalItemCount();
+    fetchItems();
   }, []);
+
 
   const handleAddItem = async (e) => {
     e.preventDefault();
@@ -68,34 +69,50 @@ const Items = () => {
     }
   };
 
-  return(
+  const isItemsEmpty = items.length === 0;
+
+  const rendered_Form = (
+    <form>
+          <label>
+            Item ID : 
+            <input type='text' value={itemId} onChange={(e) => setItemId(e.target.value)}/>
+          </label>
+          <br/>
+          <label>
+            Item Link:
+            <input type="text" value={itemLink} onChange={(e) => setItemLink(e.target.value)} />
+          </label>
+          <br />
+          <button type="button" onClick={handleAddItem}>
+            Add Item
+          </button>
+          <button type="button" onClick={handleGetItem}>
+            Get Item
+          </button>
+          <button type="button" onClick={handleUpdateItem}>
+            Update Item
+          </button>
+          <button type="button" onClick={handleDeleteItem}>
+            Delete Item
+          </button>
+        </form>
+  )
+
+  return (
     <div>
-      <form>
-        <label>
-          Item ID : 
-          <input type='text' value={itemId} onChange={(e) => setItemId(e.target.value)}/>
-        </label>
-        <br/>
-        <label>
-          Item Link:
-          <input type="text" value={itemLink} onChange={(e) => setItemLink(e.target.value)} />
-        </label>
-        <br />
-        <button type="button" onClick={handleAddItem}>
-          Add Item
-        </button>
-        <button type="button" onClick={handleGetItem}>
-          Get Item
-        </button>
-        <button type="button" onClick={handleUpdateItem}>
-          Update Item
-        </button>
-        <button type="button" onClick={handleDeleteItem}>
-          Delete Item
-        </button>
-      </form>
+      {rendered_Form}
       <div>
-        <div><p>Total Item count: {totalCount}</p></div>
+        {isItemsEmpty ? (
+          <p>Loading .....</p>
+        ):(
+          <ul>
+          {items.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+        )}
+      <div>
+      </div>
         <div><p>{message}</p></div>
         <div><p>{ID}</p></div>
         <div><p>{Link}</p></div>
@@ -103,8 +120,6 @@ const Items = () => {
       </div>
     </div>
   )
-  
-
 };
 
 export default Items;
