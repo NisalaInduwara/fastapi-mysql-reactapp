@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 
-const orders = () => {
+const Orders = () => {
   const [Order_id, setOrderID] = useState("");
   const [Order_Date, setOrderDate] =  useState("");
   const [Order_Earning, setOrderEarning] = useState("");
@@ -15,6 +15,7 @@ const orders = () => {
   const [ItemCost, setItemCost] = useState("");
 
   const [is_resolved, setIsResolved] = useState("");
+  const [ali_refund, setAliRefund] = useState("")
   const [message, setMessage]  = useState("");
 
   const handleAddPreOrder = async (e) => {
@@ -102,10 +103,24 @@ const orders = () => {
 
   const handleAddNextTracking = async (e) => {
     try{
-      
+      const response = await axios.put(`http://127.0.0.1:8000/add_next_tracking_number/
+      ?next_tracking_number=${NextTrackingNumber}&Tracking_number=${Tracking_number}`)
+      setMessage(response.data)
+    } catch (error){
+      setMessage("Error: " + error.message)
+    }
+  }
+
+  const handleResolveReturn = async (e) => {
+    try{
+      const response = await axios.put(`http://127.0.0.1:8000/resolve_return/?Order_id=${Order_id}
+      &ali_refund=${ali_refund}`)
+      setMessage(response.data)
+    }catch(error){
+    setMessage("Error: " + error.message)
     }
   }
 
 }
 
-export default orders;
+export default Orders;
