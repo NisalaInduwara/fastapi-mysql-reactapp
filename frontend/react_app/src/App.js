@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import orders from './components/orders';
+import Orders from './components/orders';
 import Items from './components/items';
 import disputes from './components/disputes';
 
@@ -42,7 +42,7 @@ function App(){
 
                 {activeTab === 'orders' &&  (
                 <div>
-                    <h2>Orders Tab Content</h2>
+                    <Orders />
                 </div>)}
 
                 {activeTab === 'items' && (
